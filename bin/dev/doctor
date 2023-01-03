@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+set -e
+set -u
+set -o pipefail
+
+source ".medic/_support/doctor.sh"
+
+# run doctor in home directory if present
+if [[ -f "${HOME}/bin/dev/doctor" ]]; then
+  if ! step "Found a doctor script in home directory" "pushd ${HOME} > /dev/null && ./bin/dev/doctor && popd > /dev/null"; then
+    exit 1
+  fi
+fi
+
+elixir -r .medic/require.exs -e "Medic.Doctor.run()" $*
