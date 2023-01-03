@@ -15,5 +15,8 @@ defmodule Gaol.MixProject do
       version: "0.1.0"
     ]
 
-  defp deps, do: []
+  defp deps,
+    do: [
+      {:rustler, "~> 0.26.0"}
+    ]
 end
