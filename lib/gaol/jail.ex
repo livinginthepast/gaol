@@ -4,13 +4,19 @@ defmodule Gaol.Jail do
   """
 
   defstruct [
-    :jid
+    :hostname,
+    :jid,
+    :name,
+    :path
   ]
 
   @typedoc """
   A representation of a running jail.
   """
   @type t() :: %__MODULE__{
-          jid: pos_integer()
+          hostname: binary(),
+          jid: pos_integer(),
+          name: binary(),
+          path: binary()
         }
 end
