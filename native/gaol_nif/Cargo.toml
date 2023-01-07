@@ -1,0 +1,15 @@
+[package]
+name = "gaol_nif"
+version = "0.1.0"
+authors = []
+edition = "2018"
+
+[lib]
+name = "gaol_nif"
+path = "src/lib.rs"
+crate-type = ["cdylib"]
+
+[dependencies]
+env_logger = "0.10"
+jail = "0.2"
+rustler = "0.26.0"
