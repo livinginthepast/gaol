@@ -5,5 +5,6 @@ rustler::atoms! {
     hostname,
     jid,
     name,
+    params,
     path,
 }

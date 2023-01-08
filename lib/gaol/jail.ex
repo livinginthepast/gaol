@@ -7,6 +7,7 @@ defmodule Gaol.Jail do
     :hostname,
     :jid,
     :name,
+    :params,
     :path
   ]
 
@@ -17,6 +18,7 @@ defmodule Gaol.Jail do
           hostname: binary(),
           jid: pos_integer(),
           name: binary(),
+          params: %{binary() => any()},
           path: binary()
         }
 end
