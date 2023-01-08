@@ -7,4 +7,6 @@ rustler::atoms! {
     name,
     params,
     path,
+
+    not_found,
 }

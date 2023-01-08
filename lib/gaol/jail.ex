@@ -11,12 +11,13 @@ defmodule Gaol.Jail do
     :path
   ]
 
-  @typedoc """
-  A representation of a running jail.
-  """
+  @typedoc "The primary identifier of a jail"
+  @type jid() :: pos_integer()
+
+  @typedoc "A representation of a running jail."
   @type t() :: %__MODULE__{
           hostname: binary(),
-          jid: pos_integer(),
+          jid: jid(),
           name: binary(),
           params: %{binary() => any()},
           path: binary()
