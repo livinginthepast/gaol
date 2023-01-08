@@ -2,6 +2,16 @@
 
 FreeBSD jails.
 
+## Dependencies
+
+```shell
+pkg install rust
+```
+
+Rust must be available in the environment used to compile Gaol. When Gaol is included
+in an Elixir release that is packaged for installation in a different system, Rust is
+not necessary in that system.
+
 ## Installation
 
 Gaol should only be included in projects built for FreeBSD. See the docs
