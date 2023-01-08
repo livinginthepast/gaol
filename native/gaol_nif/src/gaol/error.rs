@@ -9,6 +9,9 @@ pub fn to_atom(jail_error: JailError) -> Atom {
         JailError::IoError(ref e) if e.kind() == std::io::ErrorKind::PermissionDenied => {
             atoms::permission_denied()
         }
+        JailError::IoError(ref e) if e.kind() == std::io::ErrorKind::NotFound => {
+            atoms::no_such_file_or_directory()
+        }
         JailError::IoError(_) => atoms::io_error(),
         JailError::JailAttachError(_) => atoms::jail_attach_error(),
         JailError::JailGetError(_) => atoms::jail_get_error(),

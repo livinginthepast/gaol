@@ -17,6 +17,7 @@ rustler::atoms! {
     jail_max_af_ips_failed,
     jail_remove_failed,
     jail_set_error,
+    no_such_file_or_directory,
     no_such_parameter,
     not_found,
     parameter_length_nan,

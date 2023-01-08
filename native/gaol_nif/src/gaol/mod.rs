@@ -76,7 +76,10 @@ fn create<'a>(env: Env<'a>, path_term: Term<'a>, name_term: Term<'a>) -> Result<
 
     match jail.start() {
         Ok(jail) => Ok(<RunningJail as Into<Jail>>::into(jail).encode(env)),
-        Err(jail_err) => Err(error::to_atom(jail_err)),
+        Err(jail_err) => {
+            log::debug!("Error creating jail: {:?}\r", jail_err);
+            Err(error::to_atom(jail_err))
+        }
     }
 }
 
