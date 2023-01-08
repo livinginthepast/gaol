@@ -82,6 +82,7 @@ dependencies = [
  "env_logger",
  "jail",
  "libc",
+ "log",
  "rustler",
 ]
 
