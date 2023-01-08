@@ -1,7 +1,7 @@
 pub mod error;
 
 use jail::param::Value;
-use jail::RunningJail;
+use jail::{RunningJail, StoppedJail};
 use libc;
 use rustler::types::elixir_struct;
 use rustler::{Atom, Encoder, Env, Term};
@@ -87,7 +87,7 @@ pub struct Jail {
     pub jid: u32,
     pub name: String,
     pub params: HashMap<String, ParamValue>,
-    pub path: String,
+    pub path: std::path::PathBuf,
 }
 
 impl From<RunningJail> for Jail {
@@ -102,7 +102,7 @@ impl From<RunningJail> for Jail {
                 .into_iter()
                 .map(|(key, value)| (key, value.into()))
                 .collect(),
-            path: jail.path().unwrap().into_os_string().into_string().unwrap(),
+            path: jail.path().unwrap(),
         }
     }
 }
@@ -119,7 +119,10 @@ impl Encoder for Jail {
             .unwrap()
             .map_put(atoms::params().to_term(env), &self.params)
             .unwrap()
-            .map_put(atoms::path().to_term(env), &self.path)
+            .map_put(
+                atoms::path().to_term(env),
+                &self.path.clone().into_os_string().into_string().unwrap(),
+            )
             .unwrap()
     }
 }
@@ -134,6 +137,19 @@ fn all(env: Env) -> Term {
         .collect();
 
     jails.encode(env)
+}
+
+#[rustler::nif]
+fn create<'a>(env: Env<'a>, path_term: Term<'a>, name_term: Term<'a>) -> Result<Term<'a>, Atom> {
+    let path: String = path_term.decode().unwrap();
+    let name: String = name_term.decode().unwrap();
+
+    let jail = StoppedJail::new(path).name(name);
+
+    match jail.start() {
+        Ok(jail) => Ok(<RunningJail as Into<Jail>>::into(jail).encode(env)),
+        Err(jail_err) => Err(error::to_atom(jail_err)),
+    }
 }
 
 #[rustler::nif]

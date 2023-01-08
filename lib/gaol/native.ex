@@ -5,6 +5,9 @@ defmodule Gaol.Native do
   @spec all() :: [Gaol.Jail.t()]
   def all, do: __not_loaded__()
 
+  @spec create(Path.t(), binary()) :: {:ok, Gaol.Jail.t()} | {:error, atom()}
+  def create(_path, _name), do: __not_loaded__()
+
   @spec find_jail(Gaol.Jail.jid()) :: {:ok, Gaol.Jail.t()} | {:error, :not_found}
   def find_jail(_jid), do: __not_loaded__()
 
