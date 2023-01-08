@@ -13,6 +13,6 @@ fn on_load(_env: Env, _info: Term) -> bool {
 
 rustler::init!(
     "Elixir.Gaol.Native",
-    [gaol::all, gaol::find_jail],
+    [gaol::all, gaol::find_jail, gaol::kill,],
     load = on_load
 );

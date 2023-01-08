@@ -8,6 +8,9 @@ defmodule Gaol.Native do
   @spec find_jail(Gaol.Jail.jid()) :: {:ok, Gaol.Jail.t()} | {:error, :not_found}
   def find_jail(_jid), do: __not_loaded__()
 
+  @spec kill(Gaol.Jail.jid()) :: :ok | {:error, atom()}
+  def kill(_jid), do: __not_loaded__()
+
   # # #
 
   defp __not_loaded__, do: :erlang.nif_error(:nif_not_loaded)

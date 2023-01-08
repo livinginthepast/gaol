@@ -12,6 +12,8 @@ Rust must be available in the environment used to compile Gaol. When Gaol is inc
 in an Elixir release that is packaged for installation in a different system, Rust is
 not necessary in that system.
 
+Note that many jail interactions require root.
+
 ## Installation
 
 Gaol should only be included in projects built for FreeBSD. See the docs
@@ -24,4 +26,12 @@ def deps do
     {:gaol, "~> 0.1.0", target: :freebsd}
   ]
 end
+```
+
+## Development
+
+The log level of the NIF may be configured by setting `RUST_LOG` in the environment.
+
+```shell
+RUST_LOG=debug sudo iex -S mix
 ```

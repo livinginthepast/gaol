@@ -1,3 +1,5 @@
+pub mod error;
+
 use jail::param::Value;
 use jail::RunningJail;
 use libc;
@@ -141,5 +143,23 @@ fn find_jail<'a>(env: Env<'a>, jid_term: Term<'a>) -> Result<Term<'a>, Atom> {
     match RunningJail::from_jid(jid) {
         Some(jail) => Ok(<RunningJail as Into<Jail>>::into(jail).encode(env)),
         None => Err(atoms::not_found()),
+    }
+}
+
+#[rustler::nif]
+fn kill<'a>(env: Env<'a>, jid_term: Term<'a>) -> Term<'a> {
+    let jid: i32 = jid_term.decode().unwrap();
+
+    let jail = match RunningJail::from_jid(jid) {
+        Some(jail) => jail,
+        None => return (atoms::error(), atoms::not_found()).encode(env),
+    };
+
+    match jail.kill() {
+        Ok(()) => atoms::ok().encode(env),
+        Err(jail_err) => {
+            log::debug!("Unable to kill jail: {:?}\r", jail_err);
+            (atoms::error(), error::to_atom(jail_err)).encode(env)
+        }
     }
 }
