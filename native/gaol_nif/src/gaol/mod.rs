@@ -95,7 +95,7 @@ impl From<RunningJail> for Jail {
         Jail {
             hostname: jail.hostname().unwrap(),
             jid: u32::try_from(jail.jid).unwrap(),
-            name: jail.hostname().unwrap(),
+            name: jail.name().unwrap(),
             params: jail
                 .params()
                 .unwrap()
