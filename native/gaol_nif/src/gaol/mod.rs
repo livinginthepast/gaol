@@ -12,7 +12,7 @@ use crate::atoms;
 #[derive(Clone, Debug)]
 pub struct Jail {
     pub hostname: String,
-    pub jid: u32,
+    pub jid: Option<u32>,
     pub name: String,
     pub params: HashMap<String, param_value::ParamValue>,
     pub path: std::path::PathBuf,
@@ -22,7 +22,7 @@ impl From<RunningJail> for Jail {
     fn from(jail: RunningJail) -> Self {
         Jail {
             hostname: jail.hostname().unwrap(),
-            jid: u32::try_from(jail.jid).unwrap(),
+            jid: u32::try_from(jail.jid).ok(),
             name: jail.name().unwrap(),
             params: jail
                 .params()
@@ -38,8 +38,12 @@ impl From<RunningJail> for Jail {
 impl Encoder for Jail {
     fn encode<'a>(&self, env: Env<'a>) -> Term<'a> {
         let jail = elixir_struct::make_ex_struct(env, "Elixir.Gaol.Jail").unwrap();
+        let jid = match &self.jid {
+            Some(jid) => jid.encode(env),
+            None => (rustler::types::atom::nil()).encode(env),
+        };
 
-        jail.map_put(atoms::jid().to_term(env), &self.jid)
+        jail.map_put(atoms::jid().to_term(env), jid)
             .unwrap()
             .map_put(atoms::hostname().to_term(env), &self.hostname)
             .unwrap()

@@ -17,7 +17,7 @@ defmodule Gaol.Jail do
   @typedoc "A representation of a running jail."
   @type t() :: %__MODULE__{
           hostname: binary(),
-          jid: jid(),
+          jid: jid() | nil,
           name: binary(),
           params: %{binary() => any()},
           path: binary()
