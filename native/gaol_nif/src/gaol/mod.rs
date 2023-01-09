@@ -143,9 +143,7 @@ fn kill<'a>(env: Env<'a>, jid_term: Term<'a>) -> Term<'a> {
 
 #[rustler::nif]
 fn start<'a>(env: Env<'a>, resource: ResourceArc<JailResource>) -> Result<Term<'a>, Atom> {
-    let stopped = (&*resource).clone();
-
-    match stopped.jail.clone().start() {
+    match resource.jail.clone().start() {
         Ok(jail) => Ok(<RunningJail as Into<Jail>>::into(jail).encode(env)),
         Err(jail_err) => {
             log::debug!("Error creating jail: {:?}\r", jail_err);
