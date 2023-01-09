@@ -8,7 +8,8 @@ defmodule Gaol.Jail do
     :jid,
     :name,
     :params,
-    :path
+    :path,
+    :native
   ]
 
   @typedoc "The primary identifier of a jail"
@@ -17,9 +18,19 @@ defmodule Gaol.Jail do
   @typedoc "A representation of a running jail."
   @type t() :: %__MODULE__{
           hostname: binary(),
-          jid: jid() | nil,
+          jid: jid(),
           name: binary(),
           params: %{binary() => any()},
-          path: binary()
+          path: binary(),
+          native: nil
+        }
+
+  @type stopped() :: %__MODULE__{
+          hostname: binary(),
+          jid: nil,
+          name: binary(),
+          params: %{binary() => any()},
+          path: binary(),
+          native: reference()
         }
 end

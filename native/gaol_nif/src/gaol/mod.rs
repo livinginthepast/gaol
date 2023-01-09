@@ -3,11 +3,15 @@ mod param_value;
 
 use jail::{RunningJail, StoppedJail};
 use rustler::types::elixir_struct;
-use rustler::{Atom, Encoder, Env, Term};
+use rustler::{Atom, Encoder, Env, ResourceArc, Term};
 use std::collections::hash_map::HashMap;
 use std::convert::TryFrom;
 
 use crate::atoms;
+
+pub struct JailResource {
+    jail: StoppedJail,
+}
 
 #[derive(Clone, Debug)]
 pub struct Jail {
@@ -35,6 +39,22 @@ impl From<RunningJail> for Jail {
     }
 }
 
+impl From<StoppedJail> for Jail {
+    fn from(jail: StoppedJail) -> Self {
+        Jail {
+            hostname: jail.hostname.unwrap_or("".to_string()),
+            jid: None,
+            name: jail.name.unwrap_or("".to_string()),
+            params: jail
+                .params
+                .into_iter()
+                .map(|(key, value)| (key, value.into()))
+                .collect(),
+            path: jail.path.unwrap_or("/".into()),
+        }
+    }
+}
+
 impl Encoder for Jail {
     fn encode<'a>(&self, env: Env<'a>) -> Term<'a> {
         let jail = elixir_struct::make_ex_struct(env, "Elixir.Gaol.Jail").unwrap();
@@ -56,7 +76,17 @@ impl Encoder for Jail {
                 &self.path.clone().into_os_string().into_string().unwrap(),
             )
             .unwrap()
+            .map_put(
+                atoms::native().to_term(env),
+                rustler::types::atom::nil().to_term(env),
+            )
+            .unwrap()
     }
+}
+
+pub fn load(env: Env) -> bool {
+    rustler::resource!(JailResource, env);
+    true
 }
 
 #[rustler::nif]
@@ -72,19 +102,15 @@ fn all(env: Env) -> Term {
 }
 
 #[rustler::nif]
-fn create<'a>(env: Env<'a>, path_term: Term<'a>, name_term: Term<'a>) -> Result<Term<'a>, Atom> {
+fn create<'a>(env: Env<'a>, path_term: Term<'a>, name_term: Term<'a>) -> Term<'a> {
     let path: String = path_term.decode().unwrap();
     let name: String = name_term.decode().unwrap();
 
-    let jail = StoppedJail::new(path).name(name);
+    let stopped = StoppedJail::new(path).name(name);
+    let jail = <StoppedJail as Into<Jail>>::into(stopped.clone());
+    let resource = ResourceArc::new(JailResource { jail: stopped });
 
-    match jail.start() {
-        Ok(jail) => Ok(<RunningJail as Into<Jail>>::into(jail).encode(env)),
-        Err(jail_err) => {
-            log::debug!("Error creating jail: {:?}\r", jail_err);
-            Err(error::to_atom(jail_err))
-        }
-    }
+    (atoms::ok(), resource, jail.encode(env)).encode(env)
 }
 
 #[rustler::nif]
@@ -111,6 +137,19 @@ fn kill<'a>(env: Env<'a>, jid_term: Term<'a>) -> Term<'a> {
         Err(jail_err) => {
             log::debug!("Unable to kill jail: {:?}\r", jail_err);
             (atoms::error(), error::to_atom(jail_err)).encode(env)
+        }
+    }
+}
+
+#[rustler::nif]
+fn start<'a>(env: Env<'a>, resource: ResourceArc<JailResource>) -> Result<Term<'a>, Atom> {
+    let stopped = (&*resource).clone();
+
+    match stopped.jail.clone().start() {
+        Ok(jail) => Ok(<RunningJail as Into<Jail>>::into(jail).encode(env)),
+        Err(jail_err) => {
+            log::debug!("Error creating jail: {:?}\r", jail_err);
+            Err(error::to_atom(jail_err))
         }
     }
 }

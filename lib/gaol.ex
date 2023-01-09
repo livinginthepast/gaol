@@ -9,8 +9,11 @@ defmodule Gaol do
   def all, do: Native.all()
 
   @doc "Start a new jail with the given path and name"
-  @spec create(Path.t(), binary()) :: {:ok, Gaol.Jail.t()} | {:error, atom()}
-  def create(path, name), do: Native.create(path, name)
+  @spec create(Path.t(), binary()) :: Gaol.Jail.stopped()
+  def create(path, name) do
+    {:ok, ref, jail} = Native.create(path, name)
+    %{jail | native: ref}
+  end
 
   @doc "Finds a jail by jid, or returns {:error, :not_found}"
   @spec get(Gaol.Jail.jid()) :: {:ok, Gaol.Jail.t()} | {:error, :not_found}
@@ -19,4 +22,9 @@ defmodule Gaol do
   @doc "Stops a jail by jid, or returns {:error, :not_found}"
   @spec kill(Gaol.Jail.jid()) :: :ok | {:error, :not_found}
   def kill(jid), do: Native.kill(jid)
+
+  @doc "Starts a jail after all configuration has been set"
+  @spec start(Gaol.Jail.stopped()) :: {:ok, Gaol.Jail.t()} | {:error, atom()}
+  def start(%Gaol.Jail{native: ref}) when is_reference(ref),
+    do: Native.start(ref)
 end

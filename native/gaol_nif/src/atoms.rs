@@ -8,6 +8,7 @@ rustler::atoms! {
     name,
     params,
     path,
+    native,
 
     // errors
     cstring_error,
