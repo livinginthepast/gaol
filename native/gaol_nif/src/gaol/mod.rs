@@ -142,6 +142,22 @@ fn kill<'a>(env: Env<'a>, jid_term: Term<'a>) -> Term<'a> {
 }
 
 #[rustler::nif]
+fn set_hostname<'a>(
+    env: Env<'a>,
+    resource: ResourceArc<JailResource>,
+    hostname_term: Term<'a>,
+) -> Term<'a> {
+    let hostname: String = hostname_term.decode().unwrap();
+    let mut stopped = resource.jail.clone();
+    stopped = stopped.hostname(hostname);
+
+    let jail = <StoppedJail as Into<Jail>>::into(stopped.clone());
+    let resource = ResourceArc::new(JailResource { jail: stopped });
+
+    (atoms::ok(), resource, jail.encode(env)).encode(env)
+}
+
+#[rustler::nif]
 fn start<'a>(env: Env<'a>, resource: ResourceArc<JailResource>) -> Result<Term<'a>, Atom> {
     match resource.jail.clone().start() {
         Ok(jail) => Ok(<RunningJail as Into<Jail>>::into(jail).encode(env)),

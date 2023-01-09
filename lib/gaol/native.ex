@@ -7,7 +7,7 @@ defmodule Gaol.Native do
   @spec all() :: [Gaol.Jail.t()]
   def all, do: __not_loaded__()
 
-  @spec create(Path.t(), binary()) :: {:ok, reference(), Gaol.Jail.stopped()}
+  @spec create(Path.t(), binary()) :: {:ok, t(), Gaol.Jail.stopped()}
   def create(_path, _name), do: __not_loaded__()
 
   @spec find_jail(Gaol.Jail.jid()) :: {:ok, Gaol.Jail.t()} | {:error, :not_found}
@@ -15,6 +15,9 @@ defmodule Gaol.Native do
 
   @spec kill(Gaol.Jail.jid()) :: :ok | {:error, atom()}
   def kill(_jid), do: __not_loaded__()
+
+  @spec set_hostname(t(), binary()) :: {:ok, t(), Gaol.Jail.stopped()}
+  def set_hostname(_ref, _hostname), do: __not_loaded__()
 
   @spec start(t()) :: {:ok, Gaol.Jail.t()} | {:error, atom()}
   def start(_ref), do: __not_loaded__()
