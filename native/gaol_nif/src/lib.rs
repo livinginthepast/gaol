@@ -1,6 +1,39 @@
 mod atoms;
 mod gaol;
 
+mod macros {
+    macro_rules! unwrap_or_return {
+        ( $e:expr, $f:expr ) => {
+            match $e {
+                Ok(x) => x,
+                Err(_) => return Err($f),
+            }
+        };
+    }
+
+    macro_rules! decode_or_error {
+        ( $e:expr ) => {
+            match $e.decode() {
+                Ok(x) => x,
+                Err(_) => return Err(atoms::decoder_error()),
+            }
+        };
+    }
+
+    macro_rules! decode_or_error_tuple {
+        ( $e:expr, $env:expr ) => {
+            match $e.decode() {
+                Ok(x) => x,
+                Err(_) => return (atoms::error(), atoms::decoder_error()).encode($env),
+            }
+        };
+    }
+
+    pub(crate) use decode_or_error;
+    pub(crate) use decode_or_error_tuple;
+    pub(crate) use unwrap_or_return;
+}
+
 use rustler::{Env, Term};
 
 fn on_load(env: Env, _info: Term) -> bool {

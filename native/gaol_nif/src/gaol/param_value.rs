@@ -5,15 +5,7 @@ use std::net::{Ipv4Addr, Ipv6Addr};
 
 use crate::atoms;
 use crate::gaol::error;
-
-macro_rules! unwrap_or_decoder_error {
-    ( $e:expr ) => {
-        match $e {
-            Ok(x) => x,
-            Err(_) => return Err(atoms::decoder_error()),
-        }
-    };
-}
+use crate::macros;
 
 #[derive(Clone, Debug)]
 pub enum ParamValue {
@@ -42,22 +34,28 @@ impl ParamValue {
         };
 
         let value = match param_type {
-            Type::Int => Value::Int(unwrap_or_decoder_error!(value.decode())),
-            Type::Long => Value::Long(unwrap_or_decoder_error!(value.decode())),
-            Type::S16 => Value::S16(unwrap_or_decoder_error!(value.decode())),
-            Type::S32 => Value::S32(unwrap_or_decoder_error!(value.decode())),
-            Type::S64 => Value::S64(unwrap_or_decoder_error!(value.decode())),
-            Type::S8 => Value::S8(unwrap_or_decoder_error!(value.decode())),
-            Type::String => Value::String(unwrap_or_decoder_error!(value.decode())),
-            Type::U16 => Value::U16(unwrap_or_decoder_error!(value.decode())),
-            Type::U32 => Value::U32(unwrap_or_decoder_error!(value.decode())),
-            Type::U64 => Value::U64(unwrap_or_decoder_error!(value.decode())),
-            Type::U8 => Value::U8(unwrap_or_decoder_error!(value.decode())),
-            Type::Uint => Value::Uint(unwrap_or_decoder_error!(value.decode())),
-            Type::Ulong => Value::Ulong(unwrap_or_decoder_error!(value.decode())),
+            Type::Int => Value::Int(macros::decode_or_error!(value)),
+            Type::Long => Value::Long(macros::decode_or_error!(value)),
+            Type::S16 => Value::S16(macros::decode_or_error!(value)),
+            Type::S32 => Value::S32(macros::decode_or_error!(value)),
+            Type::S64 => Value::S64(macros::decode_or_error!(value)),
+            Type::S8 => Value::S8(macros::decode_or_error!(value)),
+            Type::String => Value::String(macros::decode_or_error!(value)),
+            Type::U16 => Value::U16(macros::decode_or_error!(value)),
+            Type::U32 => Value::U32(macros::decode_or_error!(value)),
+            Type::U64 => Value::U64(macros::decode_or_error!(value)),
+            Type::U8 => Value::U8(macros::decode_or_error!(value)),
+            Type::Uint => Value::Uint(macros::decode_or_error!(value)),
+            Type::Ulong => Value::Ulong(macros::decode_or_error!(value)),
 
-            Type::Ipv4Addrs => Value::Ipv4Addrs(unwrap_or_decoder_error!(decode_ipv4(value))),
-            Type::Ipv6Addrs => Value::Ipv6Addrs(unwrap_or_decoder_error!(decode_ipv6(value))),
+            Type::Ipv4Addrs => Value::Ipv4Addrs(macros::unwrap_or_return!(
+                decode_ipv4(value),
+                atoms::decoder_error()
+            )),
+            Type::Ipv6Addrs => Value::Ipv6Addrs(macros::unwrap_or_return!(
+                decode_ipv6(value),
+                atoms::decoder_error()
+            )),
         };
 
         Ok(value)

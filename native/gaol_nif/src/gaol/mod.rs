@@ -9,6 +9,7 @@ use std::convert::TryFrom;
 
 use crate::atoms;
 use crate::gaol::param_value::ParamValue;
+use crate::macros;
 
 pub struct JailResource {
     jail: StoppedJail,
@@ -104,8 +105,8 @@ fn all(env: Env) -> Term {
 
 #[rustler::nif]
 fn create<'a>(env: Env<'a>, path_term: Term<'a>, name_term: Term<'a>) -> Term<'a> {
-    let path: String = path_term.decode().unwrap();
-    let name: String = name_term.decode().unwrap();
+    let path: String = macros::decode_or_error_tuple!(path_term, env);
+    let name: String = macros::decode_or_error_tuple!(name_term, env);
 
     let stopped = StoppedJail::new(path).name(name);
     let jail = <StoppedJail as Into<Jail>>::into(stopped.clone());
@@ -116,7 +117,7 @@ fn create<'a>(env: Env<'a>, path_term: Term<'a>, name_term: Term<'a>) -> Term<'a
 
 #[rustler::nif]
 fn find_jail<'a>(env: Env<'a>, jid_term: Term<'a>) -> Result<Term<'a>, Atom> {
-    let jid: i32 = jid_term.decode().unwrap();
+    let jid: i32 = macros::decode_or_error!(jid_term);
 
     match RunningJail::from_jid(jid) {
         Some(jail) => Ok(<RunningJail as Into<Jail>>::into(jail).encode(env)),
@@ -126,7 +127,7 @@ fn find_jail<'a>(env: Env<'a>, jid_term: Term<'a>) -> Result<Term<'a>, Atom> {
 
 #[rustler::nif]
 fn kill<'a>(env: Env<'a>, jid_term: Term<'a>) -> Term<'a> {
-    let jid: i32 = jid_term.decode().unwrap();
+    let jid: i32 = macros::decode_or_error_tuple!(jid_term, env);
 
     let jail = match RunningJail::from_jid(jid) {
         Some(jail) => jail,
@@ -148,7 +149,7 @@ fn set_hostname<'a>(
     resource: ResourceArc<JailResource>,
     hostname_term: Term<'a>,
 ) -> Term<'a> {
-    let hostname: String = hostname_term.decode().unwrap();
+    let hostname: String = macros::decode_or_error_tuple!(hostname_term, env);
     let mut stopped = resource.jail.clone();
     stopped = stopped.hostname(hostname);
 
@@ -165,7 +166,7 @@ fn set_param<'a>(
     key_term: Term<'a>,
     key_value: Term<'a>,
 ) -> Term<'a> {
-    let key: String = key_term.decode().unwrap();
+    let key: String = macros::decode_or_error_tuple!(key_term, env);
     let value = match ParamValue::decode_value(env, &key, key_value) {
         Ok(value) => value,
         Err(atom) => return (atoms::error(), atom).encode(env),
