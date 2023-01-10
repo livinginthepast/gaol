@@ -4,6 +4,9 @@ defmodule Gaol do
   """
   alias Gaol.Native
 
+  @type param_key() :: binary()
+  @type param_value() :: binary() | integer() | [binary()]
+
   @doc "List all running jails"
   @spec all() :: [Gaol.Jail.t()]
   def all, do: Native.all()
@@ -22,9 +25,14 @@ defmodule Gaol do
   def kill(jid), do: Native.kill(jid)
 
   @doc "Sets the hostname on a jail that has not yet been started"
-  @spec set_hostname(Gaol.Jail.stopped(), binary()) :: {:ok, Gaol.Jail.stopped()}
+  @spec set_hostname(Gaol.Jail.stopped(), binary()) :: Gaol.Jail.stopped() | {:error, atom()}
   def set_hostname(%Gaol.Jail{native: ref}, hostname) when is_reference(ref),
     do: Native.set_hostname(ref, hostname) |> into_stopped()
+
+  @doc "Sets a parameter on a jail that has not yet been started"
+  @spec set_param(Gaol.Jail.stopped(), param_key(), param_value()) :: Gaol.Jail.stopped() | {:error, atom()}
+  def set_param(%Gaol.Jail{native: ref}, key, value) when is_reference(ref),
+    do: Native.set_param(ref, key, value) |> into_stopped()
 
   @doc "Starts a jail after all configuration has been set"
   @spec start(Gaol.Jail.stopped()) :: {:ok, Gaol.Jail.t()} | {:error, atom()}
@@ -34,4 +42,5 @@ defmodule Gaol do
   # # #
 
   defp into_stopped({:ok, ref, jail}), do: %{jail | native: ref}
+  defp into_stopped({:error, error}), do: {:error, error}
 end

@@ -21,6 +21,7 @@ rustler::init!(
         gaol::find_jail,
         gaol::kill,
         gaol::set_hostname,
+        gaol::set_param,
         gaol::start,
     ],
     load = on_load

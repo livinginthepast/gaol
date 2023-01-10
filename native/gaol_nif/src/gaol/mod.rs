@@ -8,6 +8,7 @@ use std::collections::hash_map::HashMap;
 use std::convert::TryFrom;
 
 use crate::atoms;
+use crate::gaol::param_value::ParamValue;
 
 pub struct JailResource {
     jail: StoppedJail,
@@ -18,7 +19,7 @@ pub struct Jail {
     pub hostname: String,
     pub jid: Option<u32>,
     pub name: String,
-    pub params: HashMap<String, param_value::ParamValue>,
+    pub params: HashMap<String, ParamValue>,
     pub path: std::path::PathBuf,
 }
 
@@ -150,6 +151,27 @@ fn set_hostname<'a>(
     let hostname: String = hostname_term.decode().unwrap();
     let mut stopped = resource.jail.clone();
     stopped = stopped.hostname(hostname);
+
+    let jail = <StoppedJail as Into<Jail>>::into(stopped.clone());
+    let resource = ResourceArc::new(JailResource { jail: stopped });
+
+    (atoms::ok(), resource, jail.encode(env)).encode(env)
+}
+
+#[rustler::nif]
+fn set_param<'a>(
+    env: Env<'a>,
+    resource: ResourceArc<JailResource>,
+    key_term: Term<'a>,
+    key_value: Term<'a>,
+) -> Term<'a> {
+    let key: String = key_term.decode().unwrap();
+    let value = match ParamValue::decode_value(env, &key, key_value) {
+        Ok(value) => value,
+        Err(atom) => return (atoms::error(), atom).encode(env),
+    };
+    let mut stopped = resource.jail.clone();
+    stopped = stopped.param(key, value);
 
     let jail = <StoppedJail as Into<Jail>>::into(stopped.clone());
     let resource = ResourceArc::new(JailResource { jail: stopped });

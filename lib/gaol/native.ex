@@ -16,8 +16,11 @@ defmodule Gaol.Native do
   @spec kill(Gaol.Jail.jid()) :: :ok | {:error, atom()}
   def kill(_jid), do: __not_loaded__()
 
-  @spec set_hostname(t(), binary()) :: {:ok, t(), Gaol.Jail.stopped()}
+  @spec set_hostname(t(), binary()) :: {:ok, t(), Gaol.Jail.stopped()} | {:error, atom()}
   def set_hostname(_ref, _hostname), do: __not_loaded__()
+
+  @spec set_param(t(), binary(), binary()) :: {:ok, t(), Gaol.Jail.stopped()} | {:error, atom()}
+  def set_param(_ref, _key, _value), do: __not_loaded__()
 
   @spec start(t()) :: {:ok, Gaol.Jail.t()} | {:error, atom()}
   def start(_ref), do: __not_loaded__()

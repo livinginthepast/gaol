@@ -12,6 +12,7 @@ rustler::atoms! {
 
     // errors
     cstring_error,
+    decoder_error,
     io_error,
     jail_attach_error,
     jail_get_error,
