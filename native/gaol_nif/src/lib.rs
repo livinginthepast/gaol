@@ -49,6 +49,7 @@ fn on_load(env: Env, _info: Term) -> bool {
 rustler::init!(
     "Elixir.Gaol.Native",
     [
+        gaol::add_ip,
         gaol::all,
         gaol::create,
         gaol::find_jail,

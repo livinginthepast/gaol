@@ -7,6 +7,11 @@ defmodule Gaol do
   @type param_key() :: binary()
   @type param_value() :: binary() | integer() | [binary()]
 
+  @doc "Adds an IP address to a jail that has not yet been started"
+  @spec add_ip(Gaol.Jail.stopped(), binary()) :: Gaol.Jail.stopped() | {:error, atom()}
+  def add_ip(%Gaol.Jail{native: ref}, ip) when is_reference(ref),
+    do: Native.add_ip(ref, ip) |> into_stopped()
+
   @doc "List all running jails"
   @spec all() :: [Gaol.Jail.t()]
   def all, do: Native.all()

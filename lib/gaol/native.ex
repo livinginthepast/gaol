@@ -4,6 +4,9 @@ defmodule Gaol.Native do
 
   @type t() :: reference()
 
+  @spec add_ip(t(), binary()) :: {:ok, t(), Gaol.Jail.stopped()} | {:error, atom()}
+  def add_ip(_ref, _ip), do: __not_loaded__()
+
   @spec all() :: [Gaol.Jail.t()]
   def all, do: __not_loaded__()
 

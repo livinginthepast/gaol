@@ -1,7 +1,7 @@
 use jail::param::{Type, Value};
 use libc;
 use rustler::{Atom, Encoder, Env, Term};
-use std::net::{Ipv4Addr, Ipv6Addr};
+use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 
 use crate::atoms;
 use crate::gaol::error;
@@ -144,4 +144,15 @@ fn decode_ipv6<'a>(value: Term<'a>) -> Result<Vec<Ipv6Addr>, ()> {
             Err(_) => Err(()),
         })
         .collect::<Result<Vec<Ipv6Addr>, ()>>()
+}
+
+pub fn decode_ipaddr<'a>(value: Term<'a>) -> Result<IpAddr, ()> {
+    let string: String = match value.decode() {
+        Ok(string) => string,
+        Err(_) => return Err(()),
+    };
+    match string.parse() {
+        Ok(addr) => Ok(addr),
+        Err(_) => Err(()),
+    }
 }

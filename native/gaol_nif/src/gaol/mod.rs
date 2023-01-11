@@ -92,6 +92,21 @@ pub fn load(env: Env) -> bool {
 }
 
 #[rustler::nif]
+fn add_ip<'a>(env: Env<'a>, resource: ResourceArc<JailResource>, ip_term: Term<'a>) -> Term<'a> {
+    let addr = match param_value::decode_ipaddr(ip_term) {
+        Ok(addr) => addr,
+        Err(_) => return (atoms::error(), atoms::decoder_error()).encode(env),
+    };
+    let mut stopped = resource.jail.clone();
+    stopped = stopped.ip(addr);
+
+    let jail = <StoppedJail as Into<Jail>>::into(stopped.clone());
+    let resource = ResourceArc::new(JailResource { jail: stopped });
+
+    (atoms::ok(), resource, jail.encode(env)).encode(env)
+}
+
+#[rustler::nif]
 fn all(env: Env) -> Term {
     let running_jails = RunningJail::all();
 
