@@ -31,7 +31,7 @@ defmodule Gaol.MixProject do
       {:dialyxir, "~> 1.2", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.29", only: [:dev], runtime: false},
       {:mix_audit, "~> 2.1", only: :dev, runtime: false},
-      {:rustler, "~> 0.26.0"}
+      {:rustler, "~> 0.27.0"}
     ]
 
   defp docs,
